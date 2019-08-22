@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\News;
 use App\Repository\NewsRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -18,9 +19,20 @@ class NewsController extends AbstractController
      */
     public function index(Request $request, int $page, string $_format, NewsRepository $news_repo)
     {
-        $news = $news_repo->findAll();
+        $results = $news_repo->findLatest($page);
+
+//        dd($results);
 
         return $this->render('news/index.html.twig', [
+            'paginator' => $results,
+        ]);
+    }
+
+    /**
+     * @Route("/news/{id}", name="news_view")
+     */
+    public function view(News $news){
+        return $this->render('news/view.html.twig', [
             'news' => $news,
         ]);
     }

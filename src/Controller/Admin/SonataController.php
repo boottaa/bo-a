@@ -9,7 +9,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Cache;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 
 /**
- * Class AdminSonataController
+ * Class SonataController
  *
  * @Route("/admin")
  * @IsGranted("ROLE_ADMIN")

@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\News;
+use App\Pagination\Paginator;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
@@ -19,22 +20,21 @@ class NewsRepository extends ServiceEntityRepository
         parent::__construct($registry, News::class);
     }
 
-    // /**
-    //  * @return News[] Returns an array of News objects
-    //  */
-    /*
-    public function findByExampleField($value)
+    /**
+     * @return News[] Returns an array of News objects
+     */
+    public function findLatest(int $page = 1): Paginator
     {
-        return $this->createQueryBuilder('n')
-            ->andWhere('n.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('n.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
+        $qb = $this->createQueryBuilder('n')
+            ->addSelect('a')
+            ->innerJoin('n.author', 'a')
+            ->orderBy('n.created_at', 'DESC');
+//            ->where('n.created_at <= :now')
+//            ->setParameter('now', new \DateTime())
         ;
+
+        return (new Paginator($qb))->paginate($page);
     }
-    */
 
     /*
     public function findOneBySomeField($value): ?News

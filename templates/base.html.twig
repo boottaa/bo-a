@@ -42,7 +42,7 @@
                         <form class="form-inline">
                             <ul class="navbar-nav mr-auto">
                                 {% if is_granted('IS_AUTHENTICATED_FULLY') %}
-                                    {% if is_granted('ROLE_ADMIN') %}
+                                    {% if is_granted('ROLE_USER') %}
                                         <li class="nav-item">
                                             <a class="nav-link {{ app.request.get('_route') == 'adm' ? 'active' }}" href="{{ path('adm') }}">Профиль</a>
                                         </li>
