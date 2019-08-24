@@ -1,6 +1,7 @@
 <?php
 namespace App\Controller;
 
+use App\Entity\Users;
 use App\Security\Role;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -19,4 +20,5 @@ class SonataController extends AbstractController
     {
         return $this->render('sonata/index.html.twig');
     }
+
 }

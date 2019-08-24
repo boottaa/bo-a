@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\News;
+use App\Entity\Users;
 use App\Pagination\Paginator;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
@@ -25,12 +26,23 @@ class NewsRepository extends ServiceEntityRepository
      */
     public function findLatest(int $page = 1): Paginator
     {
+
         $qb = $this->createQueryBuilder('n')
             ->addSelect('a')
             ->innerJoin('n.author', 'a')
-            ->orderBy('n.created_at', 'DESC');
-//            ->where('n.created_at <= :now')
-//            ->setParameter('now', new \DateTime())
+            ->orderBy('n.created_at', 'DESC')
+            ->where('n.published_at <= :now AND n.status = 1')
+            ->setParameter('now', new \DateTime());
+
+        return (new Paginator($qb))->paginate($page);
+    }
+
+    public function findLatestAuthor(int $page = 1, Users $user): Paginator
+    {
+        $qb = $this->createQueryBuilder('n')
+            ->orderBy('n.created_at', 'DESC')
+            ->where('n.published_at <= :now AND n.status = 1 AND n.author = :author')
+            ->setParameters(['now' => new \DateTime(), 'author' => $user->getId()])
         ;
 
         return (new Paginator($qb))->paginate($page);

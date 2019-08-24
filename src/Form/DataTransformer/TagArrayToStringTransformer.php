@@ -11,8 +11,8 @@
 
 namespace App\Form\DataTransformer;
 
-use App\Entity\Tag;
-use App\Repository\TagRepository;
+use App\Entity\Tags;
+use App\Repository\TagsRepository;
 use Symfony\Component\Form\DataTransformerInterface;
 
 /**
@@ -28,7 +28,7 @@ class TagArrayToStringTransformer implements DataTransformerInterface
 {
     private $tags;
 
-    public function __construct(TagRepository $tags)
+    public function __construct(TagsRepository $tags)
     {
         $this->tags = $tags;
     }
@@ -42,7 +42,7 @@ class TagArrayToStringTransformer implements DataTransformerInterface
         // Symfony\Bridge\Doctrine\Form\DataTransformer\CollectionToArrayTransformer::transform()
         // The value returned is a string that concatenates the string representation of those objects
 
-        /* @var Tag[] $tags */
+        /* @var Tags[] $tags */
         return implode(',', $tags);
     }
 
@@ -55,15 +55,16 @@ class TagArrayToStringTransformer implements DataTransformerInterface
             return [];
         }
 
-        $names = array_filter(array_unique(array_map('trim', explode(',', $string))));
+        $names = array_filter(array_unique(array_map('trim', explode('#', $string))));
 
         // Get the current tags and find the new ones that should be created.
         $tags = $this->tags->findBy([
             'name' => $names,
         ]);
+        
         $newNames = array_diff($names, $tags);
         foreach ($newNames as $name) {
-            $tag = new Tag();
+            $tag = new Tags();
             $tag->setName($name);
             $tags[] = $tag;
 

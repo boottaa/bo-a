@@ -5,5 +5,9 @@
         <h1 class="mt-5">Профиль: {{ app.user.username }}</h1>
         <hr>
 
+        <p>
+            Реферальная ссылка: <a href="{{ ref_link }}"> {{ ref_link }}</a><br>
+            Количество рефералов: {{ ref_count }}
+        </p>
     </main>
 {% endblock %}

@@ -44,7 +44,7 @@
                                 {% if is_granted('IS_AUTHENTICATED_FULLY') %}
                                     {% if is_granted('ROLE_USER') %}
                                         <li class="nav-item">
-                                            <a class="nav-link {{ app.request.get('_route') == 'adm' ? 'active' }}" href="{{ path('adm') }}">Профиль</a>
+                                            <a class="nav-link {{ app.request.get('_route') == 'adm_index' ? 'active' }}" href="{{ path('adm_index') }}">Профиль</a>
                                         </li>
                                     {% endif %}
                                     <li class="nav-item">

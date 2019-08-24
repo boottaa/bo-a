@@ -16,13 +16,15 @@ class AddEditNewsType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('status', HiddenType::class, ['empty_data' => 1])
-            ->add('title', TextType::class)
-            ->add('description', TextType::class)
-            ->add('text', TextareaType::class)
+            ->add('title', TextType::class, ['label'  => 'Название', 'attr' => ['autofocus' => true]])
+            ->add('description', TextareaType::class, [
+                'label'  => 'Краткое содержание',
+                'help' => 'В кратком содержании не допускается использование Markdown разметки и HTML-тегов, только простой текст.'
+            ])
+            ->add('text', TextareaType::class, ['label' => 'Содержание'])
 //            ->add('created_at')
 //            ->add('updated_at')
-//            ->add('tags', TagsInputType::class)
+            ->add('tags', TagsInputType::class, ['label' => 'Теги'])
         ;
     }
 

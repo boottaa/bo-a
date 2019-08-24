@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Security\Role;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -44,6 +45,18 @@ class Users implements UserInterface, \Serializable
     private $l_name;
 
     /**
+     * @ORM\Column(type="string", length=255, nullable=false)
+     */
+    private $ref_hash;
+
+    /**
+     * users.id пользователя который пригласил
+     *
+     * @ORM\Column(type="integer")
+     */
+    private $invited;
+
+    /**
      * @ORM\Column(type="integer")
      */
     private $role;
@@ -58,6 +71,15 @@ class Users implements UserInterface, \Serializable
      */
     private $created_at;
 
+    /**
+     * @var Followers[]|ArrayCollection
+     *
+     * @ORM\ManyToMany(targetEntity="App\Entity\Followers", cascade={"persist"})
+     * @ORM\JoinTable(name="users_followers")
+     * @ORM\OrderBy({"name": "ASC"})
+     */
+    private $followers;
+
     function __construct()
     {
         $this->f_name = '';
@@ -65,6 +87,7 @@ class Users implements UserInterface, \Serializable
         $this->role = 1;
         $this->status = 1;
         $this->created_at = new \DateTime();
+        $this->followers = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -128,6 +151,30 @@ class Users implements UserInterface, \Serializable
     public function setLName(?string $l_name): self
     {
         $this->l_name = $l_name;
+
+        return $this;
+    }
+
+    public function getRefHash(): ?string
+    {
+        return $this->ref_hash;
+    }
+
+    public function setRefHash(string $ref_hash): self
+    {
+        $this->ref_hash = $ref_hash;
+
+        return $this;
+    }
+
+    public function getInvited(): ?string
+    {
+        return $this->invited;
+    }
+
+    public function setInvited(int $invited = null): self
+    {
+        $this->invited = $invited;
 
         return $this;
     }

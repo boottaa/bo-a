@@ -31,6 +31,20 @@ class News
     private $status;
 
     /**
+     * Количество просмотров
+     *
+     * @ORM\Column(type="integer")
+     */
+    private $visitors;
+
+    /**
+     * Количество уникальных просмотров
+     *
+     * @ORM\Column(type="integer")
+     */
+    private $unique_visitors;
+
+    /**
      * @ORM\Column(type="string", length=255)
      */
     private $title;
@@ -56,6 +70,13 @@ class News
     private $updated_at;
 
     /**
+     * @var \DateTime
+     *
+     * @ORM\Column(type="datetime")
+     */
+    private $published_at;
+
+    /**
      * @var Comment[]|ArrayCollection
      *
      * @ORM\OneToMany(
@@ -69,7 +90,7 @@ class News
     private $comments;
 
     /**
-     * @var Tag[]|ArrayCollection
+     * @var Tags[]|ArrayCollection
      *
      * @ORM\ManyToMany(targetEntity="App\Entity\Tags", cascade={"persist"})
      * @ORM\JoinTable(name="news_tags")
@@ -82,6 +103,7 @@ class News
     {
         $this->created_at = new \DateTime();
         $this->updated_at = new \DateTime();
+        $this->published_at = new \DateTime();
         $this->comments = new ArrayCollection();
         $this->tags = new ArrayCollection();
         $this->status = 1;
@@ -110,6 +132,30 @@ class News
     public function setStatus(int $status)
     {
         $this->status = $status;
+
+        return $this;
+    }
+
+    public function getVisitors(): int
+    {
+        return $this->visitors;
+    }
+
+    public function setVisitors($visitors): self
+    {
+        $this->visitors = $visitors;
+
+        return $this;
+    }
+
+    public function getUniqueVisitors(): int
+    {
+        return $this->unique_visitors;
+    }
+
+    public function setUniqueVisitors($unique_visitors): self
+    {
+        $this->unique_visitors = $unique_visitors;
 
         return $this;
     }
@@ -174,7 +220,19 @@ class News
         return $this;
     }
 
-    public function getComments(Comments $comments)
+    public function getPublishedAt(): \DateTimeInterface
+    {
+        return $this->published_at;
+    }
+
+    public function setPublishedAt(\DateTimeInterface $published_at): self
+    {
+        $this->published_at = $published_at;
+
+        return $this;
+    }
+
+    public function getComments(): Collection
     {
         return $this->comments;
     }
@@ -187,7 +245,7 @@ class News
         }
     }
 
-    public function addTag(Tag ...$tags): void
+    public function addTag(Tags ...$tags): void
     {
         foreach ($tags as $tag) {
             if (!$this->tags->contains($tag)) {
@@ -196,7 +254,7 @@ class News
         }
     }
 
-    public function removeTag(Tag $tag): void
+    public function removeTag(Tags $tag): void
     {
         $this->tags->removeElement($tag);
     }

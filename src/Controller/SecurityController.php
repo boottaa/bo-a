@@ -55,16 +55,18 @@ class SecurityController extends AbstractController
             return $this->redirectToRoute('index');
         }
 
-        $form = $this->createForm(RegistrationType::class);
+        $users = new Users();
+        $form = $this->createForm(RegistrationType::class, $users);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $users = new Users();
-            $users->setLogin($form->get('login')->getData());
-            $users->setPassword($encoder->encodePassword($users, $form->get('password')->getData()));
-            $users->setEmail($form->get('email')->getData());
-            $users->setFName($form->get('f_name')->getData());
-            $users->setLName($form->get('l_name')->getData());
+            $invided = $_COOKIE['ref_id'] ?? 0;
+            $users
+                ->setPassword($encoder->encodePassword($users, $form->get('password')->getData()))
+                ->setInvited($invided)
+                ->setRefHash(md5($form->get('email')->getData() . $form->get('login')->getData()))
+            ;
+
             $em->persist($users);
             $em->flush();
             return $this->redirectToRoute('index');
@@ -73,6 +75,19 @@ class SecurityController extends AbstractController
             'controller_name' => 'IndexController',
             'form' => $form->createView(),
         ]);
+    }
+
+    /**
+     * @Route("/ref/{ref_hash<\w+>}", methods={"GET"}, name="ref")
+     */
+    public function ref(Request $request, Security $security, Users $user): Response
+    {
+        if ($security->isGranted('ROLE_USER')) {
+            return $this->redirectToRoute('adm_index');
+        }
+
+        setcookie('ref_id', $user->getId(), time() + 60 * 60 * 24 * 30, '/');
+        return $this->redirectToRoute('security_registration', [], 301);
     }
 
     /**

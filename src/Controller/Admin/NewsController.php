@@ -16,37 +16,50 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 /**
  * Class NewsController
  *
- * @Route("/admin/news", name="adm_news")
+ * @Route("/admin/news")
  * @IsGranted("ROLE_REDACTOR")
  * @package App\Controller\Admin
  */
 class NewsController extends AbstractController
 {
+
     /**
-     * @Route("/add", name="adm_news_add")
+     * @Route("/", name="adm_news")
      * @Cache(smaxage="1")
      */
-    public function index(Request $request, EntityManagerInterface $em): Response
+    public function index(Request $request, EntityManagerInterface $em, NewsRepository $news)
     {
+        return $this->render('admin/news/index.html.twig', [
+            'list' => $news->findBy(['author' => $this->getUser()], ['created_at' => 'DESC'])
+        ]);
+    }
 
-        $news = new News();
-        $news->setAuthor($this->getUser());
+    /**
+     * @Route("/add", name="adm_news_add")
+     * @Route("/edit/{id<\d+>}", name="adm_news_edit")
+     * @Cache(smaxage="1")
+     */
+    public function add(Request $request, EntityManagerInterface $em, News $news = null): Response
+    {
+        if (empty($news)) {
+            $news = new News();
+            $news->setAuthor($this->getUser());
+        }
 
         $form = $this->createForm(AddEditNewsType::class, $news);
         $form->handleRequest($request);
-        
+
         if ($form->isSubmitted() && $form->isValid()) {
-            
+
 //            $news->addTag();
-            
+
             $em->persist($news);
             $em->flush();
-            return $this->redirectToRoute('index');
+            return $this->redirectToRoute('adm_news');
         }
         return $this->render('admin/form.html.twig', [
             'controller_name' => 'IndexController',
             'form' => $form->createView(),
         ]);
-
     }
 }
