@@ -2,12 +2,18 @@
 
 {% block adm_body %}
     <main role="main" class="container">
-        <h1 class="mt-5">Профиль: {{ app.user.username }}</h1>
+        <h1 class="mt-5">
+            Профиль: {{ app.user.username }}
+            <div class="float-right">
+            <a class="btn btn-success" href="{{ path('adm_edit_profile') }}">Редактировать</a>
+            </div>
+        </h1>
         <hr>
 
         <p>
             Реферальная ссылка: <a href="{{ ref_link }}"> {{ ref_link }}</a><br>
-            Количество рефералов: {{ ref_count }}
+            Количество рефералов: {{ ref_count }}<br>
+            Количество подписок: {{ followers }}
         </p>
     </main>
 {% endblock %}

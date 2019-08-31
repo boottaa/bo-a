@@ -1,0 +1,8 @@
+{{ form_start(form, {method: 'POST', action: path('news_add_comment', {'id': news.id})}) }}
+   {{ form_widget(form) }}
+    <div class="form-group">
+        <button class="btn btn-primary pull-right" type="submit">
+            Опубликовать
+        </button>
+    </div>
+{{ form_end(form) }}

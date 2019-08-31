@@ -99,6 +99,30 @@ class News
      */
     private $tags;
 
+    /**
+     * @var Likes[]|ArrayCollection
+     *
+     * @ORM\OneToMany(
+     *      targetEntity="Likes",
+     *      mappedBy="news",
+     *      orphanRemoval=true,
+     *      cascade={"persist"}
+     * )
+     */
+    private $likes;
+
+    /**
+     * @var Dislikes[]|ArrayCollection
+     *
+     * @ORM\OneToMany(
+     *      targetEntity="Dislikes",
+     *      mappedBy="news",
+     *      orphanRemoval=true,
+     *      cascade={"persist"}
+     * )
+     */
+    private $dislikes;
+
     public function __construct()
     {
         $this->created_at = new \DateTime();
@@ -106,6 +130,8 @@ class News
         $this->published_at = new \DateTime();
         $this->comments = new ArrayCollection();
         $this->tags = new ArrayCollection();
+        $this->likes = new ArrayCollection();
+        $this->dislikes = new ArrayCollection();
         $this->status = 1;
     }
 
@@ -262,5 +288,41 @@ class News
     public function getTags(): Collection
     {
         return $this->tags;
+    }
+
+    public function addLike(Likes $like): void
+    {
+        $like->setNews($this);
+        if (!$this->likes->contains($like)) {
+            $this->likes->add($like);
+        }
+    }
+
+    public function removeLike(Likes $like): void
+    {
+        $this->likes->removeElement($like);
+    }
+
+    public function getLikes(): Collection
+    {
+        return $this->likes;
+    }
+
+    public function addDislike(Dislikes $dislikes): void
+    {
+        $dislikes->setNews($this);
+        if (!$this->dislikes->contains($dislikes)) {
+            $this->dislikes->add($dislikes);
+        }
+    }
+
+    public function removeDislike(Dislikes $dislikes): void
+    {
+        $this->dislikes->removeElement($dislikes);
+    }
+
+    public function getDislikes(): Collection
+    {
+        return $this->dislikes;
     }
 }

@@ -1,7 +1,15 @@
 {% extends 'base.html.twig' %}
 {% block body %}
     <main role="main" class="container">
-        <h1 class="mt-5">{{ author.fName }} {{ author.lName }}</h1>
+        <h1 class="mt-5">
+            {{ author.fName }} {{ author.lName }}
+
+            {% if btn_subscribed %}
+                <a class="btn btn-success" href="{{ path('subscribed_to_author', {id: author.id}) }}">Подписаться</a>
+            {% elseif app.user.id != author.id %}
+                <a class="btn btn-outline-secondary" href="{{ path('unsubscribe_to_author', {id: author.id}) }}">Отписаться</a>
+            {% endif %}
+        </h1>
         <hr>
         <div class="row">
             <div class="col-lg-12">

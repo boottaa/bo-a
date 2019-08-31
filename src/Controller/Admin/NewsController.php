@@ -50,9 +50,6 @@ class NewsController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-
-//            $news->addTag();
-
             $em->persist($news);
             $em->flush();
             return $this->redirectToRoute('adm_news');

@@ -4,8 +4,10 @@ namespace App\Entity;
 
 use App\Security\Role;
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\UsersRepository")
@@ -71,14 +73,35 @@ class Users implements UserInterface, \Serializable
      */
     private $created_at;
 
+
     /**
-     * @var Followers[]|ArrayCollection
+     * Many Users have Many Users.
+     * @ORM\ManyToMany(targetEntity="Users", mappedBy="followers")
+     */
+    private $subscribed_to;
+
+    /**
+     * Many Users have many Users.
+     * followe_user_id - Мои подписчики
+     * subscribed_to_user_id - На кого я подписан
      *
-     * @ORM\ManyToMany(targetEntity="App\Entity\Followers", cascade={"persist"})
-     * @ORM\JoinTable(name="users_followers")
-     * @ORM\OrderBy({"name": "ASC"})
+     * @ORM\ManyToMany(targetEntity="Users", inversedBy="subscribed_to")
+     * @ORM\JoinTable(name="followers",
+     *      joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id")},
+     *      inverseJoinColumns={@ORM\JoinColumn(name="followe_user_id", referencedColumnName="id")}
+     *      )
      */
     private $followers;
+
+    /**
+     * @var Tags[]|ArrayCollection
+     *
+     * @ORM\ManyToMany(targetEntity="App\Entity\Tags", cascade={"persist"})
+     * @ORM\JoinTable(name="users_hobbies")
+     * @ORM\OrderBy({"name": "ASC"})
+     * @Constraints\Count(max="6", maxMessage="Максимум 6 увлечений")
+     */
+    private $hobbies;
 
     function __construct()
     {
@@ -87,7 +110,11 @@ class Users implements UserInterface, \Serializable
         $this->role = 1;
         $this->status = 1;
         $this->created_at = new \DateTime();
+
         $this->followers = new ArrayCollection();
+        $this->subscribed_to = new ArrayCollection();
+
+        $this->hobbies = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -213,6 +240,62 @@ class Users implements UserInterface, \Serializable
         $this->created_at = $created_at;
 
         return $this;
+    }
+    
+    public function isFollowed(Users $author): bool
+    {
+        foreach ($this->getFollowers() as $follower) {
+            if ($author->getId() == $follower->getId()) {
+                return true;
+            }
+        };
+
+        return false;
+    }
+
+    public function getFollowers(): Collection
+    {
+        return $this->followers;
+    }
+
+    public function addFolloweTo(Users $follower): self
+    {
+        $this->subscribed_to->add($this);
+
+        if (!$this->followers->contains($follower)) {
+            $this->followers->add($follower);
+        }
+
+        return $this;
+    }
+
+    public function removeFolloweTo(Users $follower): void
+    {
+        $this->followers->removeElement($follower);
+    }
+
+    public function getSubscribedTo(): Collection
+    {
+        return $this->subscribed_to;
+    }
+
+    public function getHobbies()
+    {
+        return $this->hobbies;
+    }
+
+    public function addHobby(Tags $hobbies)
+    {
+        if (!$this->hobbies->contains($hobbies)) {
+            $this->hobbies->add($hobbies);
+        }
+
+        return $this;
+    }
+
+    public function removeHobby(Tags $hobbies): void
+    {
+        $this->hobbies->removeElement($hobbies);
     }
 
     /**

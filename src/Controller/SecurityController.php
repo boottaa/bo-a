@@ -78,6 +78,8 @@ class SecurityController extends AbstractController
     }
 
     /**
+     * Переход по реферальной ссылки
+     * 
      * @Route("/ref/{ref_hash<\w+>}", methods={"GET"}, name="ref")
      */
     public function ref(Request $request, Security $security, Users $user): Response

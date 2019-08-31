@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+{% block body %}
+<main role="main" class="container">
+    <h1 class="mt-5">Комментарий:</h1>
+    <h3 class="text-danger">ОШИБКА: Не удалось сохранить комментарий.</h3>
+
+    <div class="well">
+        {{ include('news/_comment_form.html.twig') }}
+    </div>
+</main>
+{% endblock %}
