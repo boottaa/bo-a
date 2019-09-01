@@ -9,12 +9,10 @@
         <h1 class="mt-5">
             {{ news.title }}
         </h1>
-        <br >
-        <div style="width: 100%; line-height: 19px;" class="float-left d-block">
-            <a style="opacity: {{ rating.vote_like ? '1.0' : '0.7' }}; text-decoration: none; color: #787869;" href="{{ path('news_add_like', {id: news.id}) }}"><i style="background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABMAAAATCAYAAAByUDbMAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAYBJREFUeNpi/P//PwO1AAuMwcjISJSGtLQ0ByC1HogTZ82atQEkBnMQEyk2Aw1SYGJi2gxkCggJCZWhyzORYhALC8uWf//+8YD4HBwcimQZBvIaMBgu/vnzRxsmJi0t/QVnmOEwRABI9QNxAnJEAV31z8nJaRu6ekaYIuQIgBpSABQrAMrzo2uSlJT8ycbGlvPw4cM9wEh4ADcDxkhPTwe5oACIFwAD2RgYNrpEBueBmTNnOqKHGcgghpCQEGESDAIBB5wR8OnTpyOkJBcpKanfOA37/v37V1IMExUVfU1yOsMFgEnkCtUMMzMzW0kVw3R0dH4Ak8kanIa9fftWkljDFBUVzwDT4icMw1JTU98rKyv/+vbtm6Gnp+cX5FjCBkC5wNjYeD7WHAAEHkCcAsRXQSkExP/69avu9evX2Z48ecJ669YttqdPn7L8+PED7IDIyMgXDg4O6iCXYeQAbOUZUI4PSFkBMSiDW4KCCYj5oNKFQD0rkcszRmqWtAABBgAn/pBDiMkW/AAAAABJRU5ErkJggg==); width: 20px; height: 20px; display: inline-block;"></i><span style="vertical-align: 5px;">{{ rating.likes }}</span></a>&nbsp;&nbsp;
-            <a style="opacity:{{ rating.vote_dislike ? '1.0' : '0.7' }}; text-decoration: none; color: #787869;" href="{{ path('news_add_dislike', {id: news.id}) }}"><i style="background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABMAAAATCAYAAAByUDbMAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAeBJREFUeNqslL1LAmEcx3307nw/dRGpaLm1BodGSXohEhwiXAIHixNqMsS1qX+gltJoioamxhrioLUhGkJwKEQElQyKUDz17vqedHKpxUU+8OW5+93vPs/z/F4eoiiKaVyDaDBCSG9OJpM7mPYhCWpDr9AddA3d5nK5l0FIn6GHAWSlabre6XRcQ6sSooIb8G9gPoceoXnoKJvN3qs+Zv0PVqt1A86OUUeAnYF8eJyiKGo3EolwWGDTYrFcaT7fYPiw1+12zQbCQ9dqNRGLmyRJ8g/BcERWluVJo8EGyD5o68NYll3Hrqj/ZLMPQ+B5wMhYYK1Wa/a/dWbWZctm9CdkU/H5fO8oIYITKUMwv9/fdjgcMjL6a0uo3z0eTyefz094vV4pFovVhzoA4xLpnikWi15BENhyuUzrY6gWtd1ul0Oh0Ec0Gn3Ajs5g3oIOoIvejnXOawBPV6vVpUqlcqwH2Ww2heM4MZFIlNxu9wlMh18dcapvJ2qgZUqpVGpBFEVaszmdTjkej1eCweANXlPwefsxloMGhmGWm82mVntSJpN5Qjy3AREMZ1MbLpeL0XaUTqcLAC0aAY2EhcPhgppunueLgUBgFaCy4UJTg6e/IPG8Aj1Dc39lkHHetJ8CDACgscYb7duTRgAAAABJRU5ErkJggg==); width: 20px; height: 20px; display: inline-block;"></i><span style="vertical-align: 5px;">{{ rating.dislikes }}</span></a>
-        </div>
-        <br>
+        {% if is_granted('IS_AUTHENTICATED_FULLY') %}
+            <br >
+            {{ render(controller('App\\Controller\\LikesController::likesForm', {'id': news.id})) }}
+        {% endif %}
         <hr>
         <div class="row">
             <div class="col-lg-12">

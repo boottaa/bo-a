@@ -103,6 +103,30 @@ class Users implements UserInterface, \Serializable
      */
     private $hobbies;
 
+    /**
+     * @var Likes[]|ArrayCollection
+     *
+     * @ORM\OneToMany(
+     *      targetEntity="Likes",
+     *      mappedBy="user",
+     *      orphanRemoval=true,
+     *      cascade={"persist"}
+     * )
+     */
+    private $likes;
+
+    /**
+     * @var Dislikes[]|ArrayCollection
+     *
+     * @ORM\OneToMany(
+     *      targetEntity="Dislikes",
+     *      mappedBy="user",
+     *      orphanRemoval=true,
+     *      cascade={"persist"}
+     * )
+     */
+    private $dislikes;
+
     function __construct()
     {
         $this->f_name = '';
@@ -115,6 +139,9 @@ class Users implements UserInterface, \Serializable
         $this->subscribed_to = new ArrayCollection();
 
         $this->hobbies = new ArrayCollection();
+
+        $this->likes = new ArrayCollection();
+        $this->dislikes = new ArrayCollection();
     }
 
     public function getId(): ?int

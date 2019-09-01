@@ -19,7 +19,7 @@ class Dislikes
     /**
      * @var Users
      *
-     * @ORM\ManyToOne(targetEntity="Users", inversedBy="id")
+     * @ORM\ManyToOne(targetEntity="Users", inversedBy="dislikes")
      * @ORM\JoinColumn(nullable=false)
      */
     private $user;
@@ -27,7 +27,7 @@ class Dislikes
     /**
      * @var News
      *
-     * @ORM\ManyToOne(targetEntity="News", inversedBy="id")
+     * @ORM\ManyToOne(targetEntity="News", inversedBy="dislikes")
      * @ORM\JoinColumn(nullable=false)
      */
     private $news;

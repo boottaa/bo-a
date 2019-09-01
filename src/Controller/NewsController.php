@@ -36,30 +36,10 @@ class NewsController extends AbstractController
     /**
      * @Route("/news/{id}", name="news_view")
      */
-    public function view(News $news){
-
-        $rating = [
-            'vote_like'    => false,
-            'vote_dislike' => false,
-        ];
-        foreach ($news->getLikes() as $like) {
-            if ($like->getUser() === $this->getUser()) {
-                $rating['vote_like'] = true;
-            }
-        }
-
-        foreach ($news->getDislikes() as $dislike) {
-            if ($dislike->getUser() === $this->getUser()) {
-                $rating['vote_dislike'] = true;
-            }
-        }
-
-        $rating['likes'] = $news->getLikes()->count();
-        $rating['dislikes'] = $news->getDislikes()->count();
-        
+    public function view(News $news)
+    {
         return $this->render('news/view.html.twig', [
             'news' => $news,
-            'rating' => $rating,
         ]);
     }
 
@@ -99,68 +79,68 @@ class NewsController extends AbstractController
             'form' => $form->createView(),
         ]);
     }
-
-    /**
-     * @Route("/news/add/like/{id}", name="news_add_like")
-     */
-    public function addLike(Request $request, EntityManagerInterface $em, EventDispatcherInterface $eventDispatcher, News $news)
-    {
-        $is_vote = false;
-        foreach ($news->getLikes() as $like) {
-            if ($like->getUser() === $this->getUser()) {
-                $is_vote = true;
-            }
-        }
-
-        foreach ($news->getDislikes() as $dislike) {
-            if ($dislike->getUser() === $this->getUser()) {
-                $is_vote = true;
-            }
-        }
-
-        if ($is_vote) {
-            $news->removeLike($news->getLikes()->current());
-        } else {
-            $like = new Likes();
-            $like->setUser($this->getUser());
-            $news->addLike($like);
-            $em->persist($like);
-        }
-
-        $em->flush();
-        
-        return $this->redirectToRoute('news_view', ['id' => $news->getId()]);
-    }
-
-    /**
-     * @Route("/news/add/dislike/{id}", name="news_add_dislike")
-     */
-    public function addDislike(Request $request, EntityManagerInterface $em, EventDispatcherInterface $eventDispatcher, News $news)
-    {
-        $is_vote = false;
-        foreach ($news->getLikes() as $like) {
-            if ($like->getUser() === $this->getUser()) {
-                $is_vote = true;
-            }
-        }
-
-        foreach ($news->getDislikes() as $dislike) {
-            if ($dislike->getUser() === $this->getUser()) {
-                $is_vote = true;
-            }
-        }
-
-        if ($is_vote) {
-            $news->removeDislike($news->getDislikes()->current());
-        } else {
-            $dislike = new Dislikes();
-            $dislike->setUser($this->getUser());
-            $news->addDislike($dislike);
-            $em->persist($dislike);
-        }
-        $em->flush();
-
-        return $this->redirectToRoute('news_view', ['id' => $news->getId()]);
-    }
+//
+//    /**
+//     * @Route("/news/add/like/{id}", name="news_add_like")
+//     */
+//    public function addLike(Request $request, EntityManagerInterface $em, EventDispatcherInterface $eventDispatcher, News $news)
+//    {
+//        $is_vote = false;
+//        foreach ($news->getLikes() as $like) {
+//            if ($like->getUser() === $this->getUser()) {
+//                $is_vote = true;
+//            }
+//        }
+//
+//        foreach ($news->getDislikes() as $dislike) {
+//            if ($dislike->getUser() === $this->getUser()) {
+//                $is_vote = true;
+//            }
+//        }
+//
+//        if ($is_vote) {
+//            $news->removeLike($news->getLikes()->current());
+//        } else {
+//            $like = new Likes();
+//            $like->setUser($this->getUser());
+//            $news->addLike($like);
+//            $em->persist($like);
+//        }
+//
+//        $em->flush();
+//
+//        return $this->redirectToRoute('news_view', ['id' => $news->getId()]);
+//    }
+//
+//    /**
+//     * @Route("/news/add/dislike/{id}", name="news_add_dislike")
+//     */
+//    public function addDislike(Request $request, EntityManagerInterface $em, EventDispatcherInterface $eventDispatcher, News $news)
+//    {
+//        $is_vote = false;
+//        foreach ($news->getLikes() as $like) {
+//            if ($like->getUser() === $this->getUser()) {
+//                $is_vote = true;
+//            }
+//        }
+//
+//        foreach ($news->getDislikes() as $dislike) {
+//            if ($dislike->getUser() === $this->getUser()) {
+//                $is_vote = true;
+//            }
+//        }
+//
+//        if ($is_vote) {
+//            $news->removeDislike($news->getDislikes()->current());
+//        } else {
+//            $dislike = new Dislikes();
+//            $dislike->setUser($this->getUser());
+//            $news->addDislike($dislike);
+//            $em->persist($dislike);
+//        }
+//        $em->flush();
+//
+//        return $this->redirectToRoute('news_view', ['id' => $news->getId()]);
+//    }
 
 }

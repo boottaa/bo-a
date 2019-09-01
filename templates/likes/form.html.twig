@@ -1,0 +1,67 @@
+<style>
+    .sonata-likes-block>button{
+        border-radius: 0px;
+        font-size: 1.0em;
+    }
+    .sonata-likes-block>button>span{
+        padding: 3px 15px;
+        vertical-align: 1px;
+    }
+</style>
+<div class="d-block sonata-likes-block">
+    <button class="btn {{ rating.vote_like ? 'btn-primary' : ' btn-outline-primary' }}" id="like"><i class="fa fa-thumbs-up" aria-hidden="true"></i><span>{{ rating.likes }}</span></button>
+    <button class="btn {{ rating.vote_dislike ? 'btn-primary' : ' btn-outline-primary' }}" id="dislike"><i class="fa fa-thumbs-down" aria-hidden="true"></i><span>{{ rating.dislikes }}</span></button>
+</div>
+<script>
+    btn_like = $('#like');
+    btn_dislike = $('#dislike');
+    vote_like = {{ rating.vote_like ? 'true' : 'false' }};
+    vote_dislike = {{ rating.vote_dislike ? 'true' : 'false' }};
+
+    $('.sonata-likes-block>button').on('click', function () {
+        btn = $(this);
+        type = btn.attr('id');
+
+        var links = {
+            like: "{{ path('news_add_like', { type: 'like', id: news_id}) }}",
+            dislike: "{{ path('news_add_like', { type: 'dislike', id: news_id}) }}"
+        };
+
+        var buttons = $('.sonata-likes-block>button');
+        if (btn.hasClass('btn-outline-primary')) {
+            if (vote_dislike || vote_like) {
+                var f = parseInt($('.btn-primary').find('span').text());
+                $('.btn-primary').find('span').text(f - 1);
+                var l = parseInt($('.btn-outline-primary').find('span').text());
+                $('.btn-outline-primary').find('span').text(l + 1);
+
+                buttons.toggleClass('btn-primary');
+                buttons.toggleClass('btn-outline-primary');
+            } else {
+                vote_like = true;
+                btn.toggleClass('btn-primary');
+                btn.toggleClass('btn-outline-primary');
+                var value = parseInt(btn.find('span').text());
+                btn.find('span').text(value + 1);
+            }
+        } else {
+            vote_like = false;
+            vote_dislike = false;
+            btn.toggleClass('btn-primary');
+            btn.toggleClass('btn-outline-primary');
+            var value = parseInt(btn.find('span').text());
+            btn.find('span').text(value - 1);
+            if (btn.hasClass('btn-primary')) {
+                vote_like = true;
+            }
+        }
+        $.ajax({
+            url: links[type],
+            success: function (data) {
+                if (data.success) {
+
+                }
+            }
+        });
+    })
+</script>

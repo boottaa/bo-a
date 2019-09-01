@@ -2,39 +2,29 @@
 
 namespace App\Repository;
 
-use App\Entity\Tags;
+use App\Entity\Likes;
+use App\Pagination\Paginator;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
-/**
- * @method Tags|null find($id, $lockMode = null, $lockVersion = null)
- * @method Tags|null findOneBy(array $criteria, array $orderBy = null)
- * @method Tags[]    findAll()
- * @method Tags[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
- */
 class LikesRepository extends ServiceEntityRepository
 {
     public function __construct(RegistryInterface $registry)
     {
-        parent::__construct($registry, Tags::class);
+        parent::__construct($registry, Likes::class);
     }
 
-    // /**
-    //  * @return Tags[] Returns an array of Tags objects
-    //  */
-    /*
-    public function findByExampleField($value)
+    public function findLatest(int $user_id, int $page = 1): Paginator
     {
-        return $this->createQueryBuilder('t')
-            ->andWhere('t.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('t.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
+        $qb = $this->createQueryBuilder('l')
+            ->addSelect('n')
+            ->innerJoin('l.news', 'n')
+            ->orderBy('n.created_at', 'DESC')
+            ->where('n.status=1 AND l.user=:userId')
+            ->setParameter('userId', $user_id);
+
+        return (new Paginator($qb))->paginate($page);
     }
-    */
 
     /*
     public function findOneBySomeField($value): ?Tags

@@ -1,0 +1,22 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block adm_body %}
+    <main role="main" class="container">
+        <h1 class="mt-5">
+            Избранное
+        </h1>
+        <hr>
+        {% for item in paginator.results %}
+            <div style="margin-bottom: 25px">
+                <h4>
+                    <a style="color: rgb(33, 37, 41);"
+                       href="{{ path('news_view', {id: item.news.id}) }}">{{ item.news.title }}</a>
+                </h4>
+                <p>{{ item.news.description }}</p>
+            {#</div>#}
+        {% else %}
+            Пока вы не добавили нечего в избранное
+        {% endfor %}
+
+    </main>
+{% endblock %}

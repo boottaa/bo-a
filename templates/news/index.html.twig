@@ -17,7 +17,7 @@
                         <div class="text-muted small">
                             <a class="text-muted" style="text-decoration: none" href="{{ path('author', {id: item.author.id}) }}"> Автор: {{ item.author.fName }} {{ item.author.LName }}</a>
                             от: {{ item.publishedAt|date("d.m.Y H:i") }}</div>
-                        <p>{{ item.text }}</p>
+                        <p>{{ item.description }}</p>
                     </div>
                 {% endfor %}
             </div>
