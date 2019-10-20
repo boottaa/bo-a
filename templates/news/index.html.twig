@@ -3,25 +3,76 @@
 {% block title %}Hello NewsController!{% endblock %}
 
 {% block body %}
-
+    <link href="{{ asset('statics/css/bootstrap-tokenfield.min.css') }}" type="text/css" rel="stylesheet"/>
+    <script src="{{ asset('statics/js/bootstrap-tokenfield.min.js') }}"></script>
+    <style>
+        .form-control.input-search.tokenfield:focus {
+            border-color: inherit;
+            -webkit-box-shadow: none;
+            box-shadow: none;
+        }
+        .tokenfield{
+            border: 0px;
+            height: 35px;
+        }
+        .tokenfield.focus{
+            border: 0px;
+            box-shadow: none;
+        }
+        .tokenfield .token{
+            height: auto;
+        }
+    </style>
     <main role="main" class="container">
         <h1 class="mt-5">Новости sonata</h1>
-        <hr>
+        <div style="border-bottom: 1px solid rgba(0, 0, 0, 0.1)" class="input-group mb-3">
+            <div class="input-group-prepend">
+                <button style="border: 0px;" class="btn btn-outline-secondary" type="button" id="button-addon1"><i class="fa fa-search" aria-hidden="true"></i></button>
+            </div>
+            <input type="text" class="form-control input-search tokenfield" style="border-radius: 0px;" placeholder="" aria-label="Example text with button addon" aria-describedby="button-addon1">
+        </div>
         <div class="row">
             <div class="col-lg-12">
                 {% for item in paginator.results %}
-                    <div style="margin-bottom: 25px">
-                        <h4><a style="color: rgb(33, 37, 41);"
-                               href="{{ path('news_view', {id: item.id}) }}">{{ item.title }}</a></h4>
-
-                        <div class="text-muted small">
-                            <a class="text-muted" style="text-decoration: none" href="{{ path('author', {id: item.author.id}) }}"> Автор: {{ item.author.fName }} {{ item.author.LName }}</a>
-                            от: {{ item.publishedAt|date("d.m.Y H:i") }}</div>
-                        <p>{{ item.description }}</p>
-                    </div>
+                    {% include 'news/_item.html.twig' with {'item': item} %}
                 {% endfor %}
             </div>
         </div>
+        {% include 'bootstrap4.pagination.html.twig' with {'paginator': paginator} %}
     </main>
+    <script>
+        let tag = "{{ app.request.attributes.get('_route_params').tag != 'all' ? app.request.attributes.get('_route_params').tag | raw }}";
 
+        url = (location.href).split('/');
+        params = null;
+        if(url.length > 4){
+            params = url.pop();
+        }
+        url = url.join('/');
+
+        $('.tokenfield').tokenfield({
+            delimiter: '|',
+            limit: 6,
+            tokens: (tag).split('&')
+        });
+        $('.tokenfield').on('tokenfield:removedtoken', function (e) {
+            let p = (params).split('&');
+            e = encodeURI(e.attrs.value);
+            p = $.grep(p, function(v) {
+                return v !== e;
+            });
+
+            location.href = url + '/' + p.join('&');
+        });
+        $('.tokenfield').on('tokenfield:createtoken', function (e) {
+            var loc = url + '/';
+            if (params !== null) {
+                loc += params + '&' + e.attrs.value;
+            }else{
+                loc += e.attrs.value;
+            }
+
+            location.href = loc;
+        })
+    </script>
 {% endblock %}

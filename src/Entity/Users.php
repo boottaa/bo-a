@@ -69,10 +69,22 @@ class Users implements UserInterface, \Serializable
     private $status;
 
     /**
+     * @ORM\Column(type="integer")
+     */
+    private $points;
+
+    /**
+     * По количеству экспы будм определять уровень
+     * @example level-1 <= 1 000 expa level-2 <= 2 000 expa...
+     *
+     * @ORM\Column(type="integer")
+     */
+    private $exp;
+
+    /**
      * @ORM\Column(type="datetime")
      */
     private $created_at;
-
 
     /**
      * Many Users have Many Users.
@@ -94,10 +106,12 @@ class Users implements UserInterface, \Serializable
     private $followers;
 
     /**
+     * users_hobbies
+     *
      * @var Tags[]|ArrayCollection
      *
      * @ORM\ManyToMany(targetEntity="App\Entity\Tags", cascade={"persist"})
-     * @ORM\JoinTable(name="users_hobbies")
+     * @ORM\JoinTable(name="users_tags")
      * @ORM\OrderBy({"name": "ASC"})
      * @Constraints\Count(max="6", maxMessage="Максимум 6 увлечений")
      */
@@ -127,13 +141,27 @@ class Users implements UserInterface, \Serializable
      */
     private $dislikes;
 
+    /**
+     * @var UsersLogs[]|ArrayCollection
+     *
+     * @ORM\OneToMany(
+     *      targetEntity="UsersLogs",
+     *      mappedBy="users",
+     *      orphanRemoval=true
+     * )
+     * @ORM\OrderBy({"created_at": "DESC"})
+     */
+    private $usersLogs;
+
     function __construct()
     {
         $this->f_name = '';
         $this->l_name = '';
-        $this->role = 1;
+        $this->role = 12;
         $this->status = 1;
         $this->created_at = new \DateTime();
+        $this->points = 0;
+        $this->exp = 0;
 
         $this->followers = new ArrayCollection();
         $this->subscribed_to = new ArrayCollection();
@@ -142,6 +170,7 @@ class Users implements UserInterface, \Serializable
 
         $this->likes = new ArrayCollection();
         $this->dislikes = new ArrayCollection();
+        $this->usersLogs = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -257,16 +286,33 @@ class Users implements UserInterface, \Serializable
         return $this;
     }
 
+    public function getPoints()
+    {
+        return $this->points;
+    }
+
+    public function addPoints(int $points): self
+    {
+        $this->points = $this->points + $points;
+
+        return $this;
+    }
+
+    public function getExp()
+    {
+        return $this->exp;
+    }
+
+    public function addExpa(int $expa): self
+    {
+        $this->exp = $this->exp + $expa;
+
+        return $this;
+    }
+
     public function getCreatedAt(): ?\DateTimeInterface
     {
         return $this->created_at;
-    }
-
-    public function setCreatedAt(\DateTimeInterface $created_at): self
-    {
-        $this->created_at = $created_at;
-
-        return $this;
     }
     
     public function isFollowed(Users $author): bool
@@ -275,7 +321,7 @@ class Users implements UserInterface, \Serializable
             if ($author->getId() == $follower->getId()) {
                 return true;
             }
-        };
+        }
 
         return false;
     }
@@ -351,7 +397,7 @@ class Users implements UserInterface, \Serializable
         $securityRole = new Role();
         foreach (str_split($this->getRole()) as $role) {
             $result[] = $securityRole->get($role);
-        };
+        }
 
         return $result;
     }
@@ -377,5 +423,13 @@ class Users implements UserInterface, \Serializable
      */
     public function eraseCredentials()
     {
-        // TODO: Implement eraseCredentials() method.
-}}
+    }
+
+    /**
+     * @return Collection|UsersLogs[]
+     */
+    public function getUsersLogs(): Collection
+    {
+        return $this->usersLogs;
+    }
+}

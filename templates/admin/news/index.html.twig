@@ -1,5 +1,4 @@
 {% extends 'admin/base.html.twig' %}
-
 {% block adm_body %}
     <main role="main" class="container">
         <h1 class="mt-5">
@@ -7,22 +6,34 @@
             <a class="btn btn-success btn-lg" style="border-radius: 50%" href="{{ path('adm_news_add') }}"><i style="font-weight: 700">&plus;</i></a>
         </h1>
         <hr>
-        {% for item in list %}
-            <div style="margin-bottom: 25px">
-                <h4>
-                    <a style="color: rgb(33, 37, 41);"
-                       href="{{ path('news_view', {id: item.id}) }}">{{ item.title }}</a>
+        {% for item in pagination.results %}
 
-                    <div class="float-right small">
-                        <a href="{{ path('adm_news_edit', {id: item.id}) }}">Редактировать</a>
-                        <a href="{{ path('news_view', {id: item.id}) }}">Удалить</a>
+            <div>
+                {% for badge in item.badges %}
+                    <span class="badge {{ badge.class }}">{{ badge.text }}</span>
+                {% endfor %}
+                <div class="float-right small">
+                    <div class="dropdown">
+                        <button class="btn btn-outline-success dropdown-toggle" type="button"
+                                id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true"
+                                aria-expanded="false">
+                            Действие
+                        </button>
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                            {% for action in item.actions %}
+                                <a class="dropdown-item" href="{{ action.href }}">{{ action.text }}</a>
+                            {% endfor %}
+                        </div>
                     </div>
-                </h4>
-                <p>{{ item.description }}</p>
+
+                </div>
+                {% include 'news/_item.html.twig' with {'item': item} %}
             </div>
+{#            <hr >#}
         {% else %}
             Вы не опубликовали ни одной новости
         {% endfor %}
 
+        {% include 'bootstrap4.pagination.html.twig' with {'rout': 'adm_news', 'paginator': pagination} %}
     </main>
 {% endblock %}

@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -12,6 +13,14 @@ use Symfony\Component\Validator\Constraints;
  */
 class News
 {
+    public const
+        //новое еще не проверили
+        STATUS_IS_NEW = 30,
+        //не прошло модерацию
+        STATUS_IS_CANCEL = 20,
+        //опубликовано
+        STATUS_IS_PUBLISH = 10;
+
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()
@@ -52,6 +61,11 @@ class News
     /**
      * @ORM\Column(type="string", length=2000)
      */
+    private $img;
+
+    /**
+     * @ORM\Column(type="string", length=2000)
+     */
     private $description;
 
     /**
@@ -60,21 +74,9 @@ class News
     private $text;
 
     /**
-     * @ORM\Column(type="datetime")
+     * @ORM\Column(type="string", length=355)
      */
-    private $created_at;
-
-    /**
-     * @ORM\Column(type="datetime")
-     */
-    private $updated_at;
-
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(type="datetime")
-     */
-    private $published_at;
+    private $slug;
 
     /**
      * @var Comment[]|ArrayCollection
@@ -90,9 +92,9 @@ class News
     private $comments;
 
     /**
-     * @var Tags[]|ArrayCollection
+     * @var Tags[]|ArrayCollection fetch="EAGER" Получает автоматически даные
      *
-     * @ORM\ManyToMany(targetEntity="App\Entity\Tags", cascade={"persist"})
+     * @ORM\ManyToMany(targetEntity="App\Entity\Tags", cascade={"persist"}, fetch="EAGER")
      * @ORM\JoinTable(name="news_tags")
      * @ORM\OrderBy({"name": "ASC"})
      * @Constraints\Count(max="6", maxMessage="Максимум 6 тегов")
@@ -123,16 +125,37 @@ class News
      */
     private $dislikes;
 
+    /**
+     * @ORM\Column(type="datetime")
+     */
+    private $created_at;
+
+    /**
+     * @ORM\Column(type="datetime")
+     */
+    private $updated_at;
+
+    /**
+     * @var DateTime
+     *
+     * @ORM\Column(type="datetime")
+     */
+    private $published_at;
+
+    private $badge, $action;
+
     public function __construct()
     {
-        $this->created_at = new \DateTime();
-        $this->updated_at = new \DateTime();
-        $this->published_at = new \DateTime();
+        $this->created_at = new DateTime();
+        $this->updated_at = new DateTime();
+        $this->published_at = new DateTime();
         $this->comments = new ArrayCollection();
         $this->tags = new ArrayCollection();
         $this->likes = new ArrayCollection();
         $this->dislikes = new ArrayCollection();
-        $this->status = 1;
+
+        $this->visitors = 0;
+        $this->unique_visitors = 0;
     }
 
     public function getId(): ?int
@@ -324,5 +347,84 @@ class News
     public function getDislikes(): Collection
     {
         return $this->dislikes;
+    }
+
+    public function getBadges()
+    {
+        return $this->badge;
+    }
+
+    /**
+     * @link https://getbootstrap.com/docs/4.0/components/badge/
+     *
+     * @param $text
+     * @param string $class
+     */
+    public function addBadge($text, $class = 'badge-dark')
+    {
+        $this->badge[] = [
+            'text' => $text,
+            'class' => $class,
+        ];
+    }
+
+    public function getActions()
+    {
+        return $this->action;
+    }
+
+    public function addAction($text, $href)
+    {
+        $this->action[] = [
+            'text' => $text,
+            'href' => $href,
+        ];
+    }
+
+    /**
+     * @return string
+     */
+    public function getImg(): ?string
+    {
+        return $this->img;
+    }
+
+    /**
+     * @param string|null $img
+     * @return $this
+     */
+    public function setImg(string $img = null): self
+    {
+        if(isset($img)){
+            $this->img = $img;
+        }
+
+        return $this;
+    }
+
+    public function removeImg(): self
+    {
+        if(!empty($this->img)){
+            $this->img = null;
+        }
+    }
+
+    /**
+     * @return string
+     */
+    public function getSlug()
+    {
+        return $this->slug;
+    }
+
+    /**
+     * @param string $slug
+     * @return News
+     */
+    public function setSlug(string $slug): self
+    {
+        $this->slug = $slug;
+
+        return $this;
     }
 }

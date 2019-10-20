@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="083faaae-526b-40b9-b23c-8b6031fbe8c4" name="cms.igp.pw" url="http://cms.igp.pw">
+        <fileTransfer host="37.140.192.207" port="22" rootFolder="/var/www/u0658850/data/www/cms.igp.pw/" accessType="SFTP">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" />
+          </advancedOptions>
+          <option name="port" value="22" />
+        </fileTransfer>
+      </webServer>
+      <webServer id="c2376fe1-12dd-4b46-b19e-76d3a54bcdbd" name="sonata" url="http://sonata.local">
+        <fileTransfer port="0" accessType="LOCAL" />
+      </webServer>
+    </option>
+  </component>
+</project>

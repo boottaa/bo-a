@@ -7,16 +7,9 @@
         </h1>
         <hr>
         {% for item in paginator.results %}
-            <div style="margin-bottom: 25px">
-                <h4>
-                    <a style="color: rgb(33, 37, 41);"
-                       href="{{ path('news_view', {id: item.news.id}) }}">{{ item.news.title }}</a>
-                </h4>
-                <p>{{ item.news.description }}</p>
-            {#</div>#}
+            {% include 'news/_item.html.twig' with {'item': item.news} %}
         {% else %}
             Пока вы не добавили нечего в избранное
         {% endfor %}
-
     </main>
 {% endblock %}

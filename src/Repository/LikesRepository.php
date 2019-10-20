@@ -20,7 +20,7 @@ class LikesRepository extends ServiceEntityRepository
             ->addSelect('n')
             ->innerJoin('l.news', 'n')
             ->orderBy('n.created_at', 'DESC')
-            ->where('n.status=1 AND l.user=:userId')
+            ->where('n.status=10 AND l.user=:userId')
             ->setParameter('userId', $user_id);
 
         return (new Paginator($qb))->paginate($page);

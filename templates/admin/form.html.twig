@@ -1,12 +1,28 @@
 {% extends 'admin/base.html.twig' %}
+
 {% block adm_body %}
+    <link href="{{ asset('statics/css/upload.css') }}" type="text/css" rel="stylesheet"/>
+    <script src="{{ asset('statics/js/jquery.uploadPreview.min.js') }}"></script>
+
+    <link href="{{ asset('statics/css/jodit.min.css') }}" type="text/css" rel="stylesheet"/>
+    <script src="{{ asset('statics/js/jodit.min.js') }}"></script>
+
+    <link href="{{ asset('statics/css/bootstrap-tokenfield.min.css') }}" type="text/css" rel="stylesheet"/>
+    <script src="{{ asset('statics/js/bootstrap-tokenfield.min.js') }}"></script>
+
+    <link href="{{ asset('statics/css/jquery.datetimepicker.min.css') }}" type="text/css" rel="stylesheet"/>
+    <script src="{{ asset('statics/js/jquery.datetimepicker.full.min.js') }}"></script>
+
+    <style>
+        .SonataForm {
+            margin: 100px 0px;
+        }
+    </style>
     <main role="main" class="container">
-        <br><br><br>
         <div class="row justify-content-center">
             <div class="col-12">
-                {{ form_start(form) }}
+                {{ form_start(form, {'attr': {'class': 'SonataForm'}}) }}
                 {{ form_widget(form) }}
-
                 <button style="border-radius: 0px; border: 0px; border-bottom: solid 1px #ced4da;" type="submit" class="btn btn-sm btn-outline-secondary btn-block">
                     <i class="fa fa-save" aria-hidden="true"></i> Сохранить
                 </button>
@@ -14,5 +30,80 @@
             </div>
         </div>
     </main>
+    <script type="text/javascript">
+        let file = $('.uploadPreview');
+        let parentFile = file.parent();
+        let label = parentFile.find('.custom-file-label');
+        let urlImg = '';
+        {% if form.vars.data.img is defined %}
+        urlImg = escape("{{ form.vars.data.img }}");
+        {% endif %}
+        label.removeClass('custom-file-label');
+        parentFile.css({
+            'height': '200px',
+        });
+        file.css({
+            'height': '200px',
+        });
 
+        label.css({
+            'position': 'absolute',
+            'top': 0,
+            'right': 0,
+            'left': 0,
+            'z-index': 1,
+            'height': '200px',
+            'padding': '0.375rem 0.75rem',
+            'line-height': '1.5',
+            'background-color': '#fff',
+            'border-radius': '0.25rem',
+            'color': '#7e7e7e',
+            'border': '#7e7e7e dashed 1px',
+            'background-image': "url('" + urlImg + "')",
+            'background-size': 'cover',
+            'background-position': 'center, center',
+        });
+        label.addClass('image-preview');
+
+        $.uploadPreview({
+            input_field: ".uploadPreview",   // Default: .image-upload
+            preview_box: ".image-preview",  // Default: .image-preview
+            label_field: "#image-label",    // Default: .image-label
+            label_default: "Choose File",   // Default: Choose File
+            label_selected: "Change File",  // Default: Change File
+            no_label: false                 // Default: false
+        });
+
+        //Editor
+        $('.jodit').each(function () {
+            var editor = new Jodit(this, {
+                height: 500,
+            });
+            editor.value = $(this).text();
+        });
+
+        //Tags
+        $('.tokenfield').tokenfield({
+            delimiter: ' ',
+            limit: 6
+        })
+
+        //DateTimePicker
+        $('.sonataDatetime').datetimepicker({
+            i18n:{
+                en:{
+                    months:[
+                        'Январь','Февраль','Март','Апрель',
+                        'Май','Июнь','Июль','Август',
+                        'Сентябрь','Октябрь','Ноябрь','Декабрь',
+                    ],
+                    dayOfWeek:[
+                        "Пн.", "Вт", "Ср", "Чт",
+                        "Пт", "Сб", "Вс",
+                    ]
+                }
+            },
+            format:'d.m.Y H:i'
+        });
+    </script>
 {% endblock %}

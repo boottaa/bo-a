@@ -1,12 +1,8 @@
 {% extends 'base.html.twig' %}
-
 {% block title %}Hello NewsController!{% endblock %}
-
 {% block body %}
-
     <main role="main" class="container">
-
-        <h1 class="mt-5">
+        <h1 class="mt-5" style="word-wrap: break-word;">
             {{ news.title }}
         </h1>
         {% if is_granted('IS_AUTHENTICATED_FULLY') %}
@@ -15,13 +11,41 @@
         {% endif %}
         <hr>
         <div class="row">
+
             <div class="col-lg-12">
-                {{ news.text }}
+                <img src="{{ news.img }}" style="width: 100%; margin-top: 5px; margin-bottom: 15px">
+                <!-- AddToAny BEGIN -->
+                <div class="a2a_kit a2a_kit_size_32 a2a_default_style">
+                    {#                    <a class="a2a_dd" href="https://www.addtoany.com/share"></a>#}
+                    <a class="a2a_button_facebook"></a>
+                    <a class="a2a_button_twitter"></a>
+                    <a class="a2a_button_odnoklassniki"></a>
+                    <a class="a2a_button_vk"></a>
+                </div>
+                <script async src="https://static.addtoany.com/menu/page.js"></script>
+                <!-- AddToAny END -->
             </div>
-
+            <div class="col-lg-12 sonata-wrap">
+                {{ news.text | raw }}
+            </div>
+            <div class="col-lg-12">
+                <!-- AddToAny BEGIN -->
+                <div class="a2a_kit a2a_kit_size_32 a2a_default_style">
+                    {#                    <a class="a2a_dd" href="https://www.addtoany.com/share"></a>#}
+                    <a class="a2a_button_facebook"></a>
+                    <a class="a2a_button_twitter"></a>
+                    <a class="a2a_button_odnoklassniki"></a>
+                    <a class="a2a_button_vk"></a>
+                </div>
+                <script async src="https://static.addtoany.com/menu/page.js"></script>
+                <!-- AddToAny END -->
+            </div>
             <div style="margin-top: 50px" class="col-lg-12">
+                {% for tag in news.tags %}
+                    <h5 class="d-inline-block"><a href="{{ path('news_index', {'tag': tag.name}) }}"
+                                                  class="badge badge-primary">#{{ tag.name }}</a></h5>
+                {% endfor %}
                 <h4>Комментарии:</h4>
-
                 <div id="post-add-comment" class="well">
                     {% if is_granted('IS_AUTHENTICATED_FULLY') %}
                         {{ render(controller('App\\Controller\\NewsController::commentForm', {'id': news.id})) }}
@@ -35,6 +59,7 @@
                     {% endif %}
                 </div>
 
+
                 {% for comment in news.comments %}
                     <div style="margin-top: 40px" class="row post-comment">
                         <a name="comment_{{ comment.id }}"></a>
@@ -42,7 +67,7 @@
                             <strong>{{ comment.author.lName }} {{ comment.author.fName }}</strong><br>
                             <span class="text-muted">{{ comment.createdAt|date("d.m.Y H:i") }}</span>
                         </p>
-                        <div class="col-sm-10">
+                        <div class="col-sm-10 sonata-wrap">
                             {{ comment.text }}
                         </div>
                     </div>
@@ -54,5 +79,8 @@
             </div>
         </div>
     </main>
-
+    <script>
+        //analytics_counter
+        $.get('{{ path('analytics_counter', {'id': news.id}) }}')
+    </script>
 {% endblock %}

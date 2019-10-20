@@ -2,10 +2,13 @@
 
 namespace App\Controller;
 
+use App\Entity\User;
 use App\Entity\Users;
+use App\Form\ForgotPasswordType;
 use App\Form\RegistrationType;
-use App\Security\Role;
+use App\Utils\Exp;
 use Doctrine\ORM\EntityManagerInterface;
+use Swift_Mailer;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -43,13 +46,14 @@ class SecurityController extends AbstractController
 
     /**
      * @Route("/registration", name="security_registration")
+     *
      * @param Request                      $request
      * @param EntityManagerInterface       $em
      * @param UserPasswordEncoderInterface $encoder
      *
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function registration(Request $request, Security $security, EntityManagerInterface $em, UserPasswordEncoderInterface $encoder)
+    public function registration(Request $request, Security $security, EntityManagerInterface $em, UserPasswordEncoderInterface $encoder, Exp $exp)
     {
         if ($security->isGranted('ROLE_USER')) {
             return $this->redirectToRoute('index');
@@ -64,13 +68,63 @@ class SecurityController extends AbstractController
             $users
                 ->setPassword($encoder->encodePassword($users, $form->get('password')->getData()))
                 ->setInvited($invided)
-                ->setRefHash(md5($form->get('email')->getData() . $form->get('login')->getData()))
-            ;
-
+                ->setRefHash(md5($form->get('email')->getData() . $form->get('login')->getData()));
             $em->persist($users);
+
+            if (!empty($invided)) {
+                /** @var Users $invidedUser */
+                $invidedUser = $em->find(Users::class, $invided);
+                $exp->addExp(Exp::ACTION_REFERAL, $users, $invidedUser);
+            }
             $em->flush();
-            return $this->redirectToRoute('index');
+            return $this->redirectToRoute('security_login');
         }
+        return $this->render('security/registration.html.twig', [
+            'controller_name' => 'IndexController',
+            'form' => $form->createView(),
+        ]);
+    }
+
+    /**
+     * @Route("/forgotpass", name="security_forgotpass")
+     *
+     * @param Request $request
+     * @param EntityManagerInterface $em
+     * @param Swift_Mailer $mailer
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     * @throws \Exception
+     */
+    public function forgotpass(Request $request, EntityManagerInterface $em, Swift_Mailer $mailer)
+    {
+        $form = $this->createForm(ForgotPasswordType::class);
+        $form->handleRequest($request);
+//        if ($form->isSubmitted() && $form->isValid()) {
+//            $email = $form->getData();
+//            $em->getRepository(Users::class)
+//                ->findOneBy(array('email' => $email['email']));
+//
+//            $identifier = random_bytes(10);
+//
+//            $url = $this->generateUrl('reset_password', array('email' => $email['email'], 'identifier' => $identifier));
+//
+//            return $this->redirectToRoute('url');
+//        }
+
+        $message = (new \Swift_Message('Hello Email'))
+            ->setFrom('send@example.com')
+            ->setTo('bootta@yandex.ru')
+            ->setBody('test',
+//                $this->renderView(
+//                // templates/emails/registration.html.twig
+//                    'emails/registration.html.twig',
+//                    ['name' => 'vasya']
+//                ),
+                'text/html'
+            );
+
+        $mailer->send($message);
+
+
         return $this->render('security/registration.html.twig', [
             'controller_name' => 'IndexController',
             'form' => $form->createView(),

@@ -6,7 +6,9 @@ use App\Entity\News;
 use App\Entity\Users;
 use App\Pagination\Paginator;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Exception;
 use Symfony\Bridge\Doctrine\RegistryInterface;
+use function Doctrine\ORM\QueryBuilder;
 
 /**
  * @method News|null find($id, $lockMode = null, $lockVersion = null)
@@ -16,47 +18,76 @@ use Symfony\Bridge\Doctrine\RegistryInterface;
  */
 class NewsRepository extends ServiceEntityRepository
 {
+    /**
+     * @param string $entityClass The class name of the entity this repository manages
+     */
     public function __construct(RegistryInterface $registry)
     {
         parent::__construct($registry, News::class);
     }
 
     /**
-     * @return News[] Returns an array of News objects
+     * @param array $tags
+     * @param int $page
+     * @return Paginator
+     * @throws Exception
      */
-    public function findLatest(int $page = 1): Paginator
+    public function findLatest(array $tags, int $page = 1): Paginator
     {
-
         $qb = $this->createQueryBuilder('n')
-            ->addSelect('a')
+            ->addSelect('a', 't')
             ->innerJoin('n.author', 'a')
+            ->innerJoin('n.tags', 't')
             ->orderBy('n.created_at', 'DESC')
-            ->where('n.published_at <= :now AND n.status = 1')
-            ->setParameter('now', new \DateTime());
+            ->where('n.published_at <= :now')
+            ->andWhere('n.status = :status')
+            ->setParameters(['now' => new \DateTime(), 'status' => News::STATUS_IS_PUBLISH]);
+        if(!empty($tags) && current($tags) !== 'all'){
+            $qb->andWhere($qb->expr()->andX(
+                $qb->expr()->in('t.name', ':tag')
+            ))->setParameter('tag', implode(',', $tags));
+        }
 
         return (new Paginator($qb))->paginate($page);
     }
 
-    public function findLatestAuthor(int $page = 1, Users $user): Paginator
+    /**
+     * @param Users $user
+     * @param int $page
+     * @return Paginator
+     * @throws Exception
+     */
+    public function findLatestAuthor(Users $user, int $page = 1): Paginator
     {
         $qb = $this->createQueryBuilder('n')
             ->orderBy('n.created_at', 'DESC')
-            ->where('n.published_at <= :now AND n.status = 1 AND n.author = :author')
-            ->setParameters(['now' => new \DateTime(), 'author' => $user->getId()])
-        ;
+            ->where('n.published_at <= :now AND n.status= :status AND n.author = :author')
+            ->setParameters([
+                'now'    => new \DateTime(),
+                'author' => $user->getId(),
+                'status' => News::STATUS_IS_PUBLISH
+            ]);
 
         return (new Paginator($qb))->paginate($page);
     }
 
-    /*
-    public function findOneBySomeField($value): ?News
+    /**
+     * @param int $page
+     * @param Users $user
+     * @return Paginator
+     * @throws Exception
+     */
+    public function findLatestForAdmin(int $page = 1, Users $user): Paginator
     {
-        return $this->createQueryBuilder('n')
-            ->andWhere('n.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
+        $qb = $this->createQueryBuilder('n')
+            ->orderBy('n.created_at', 'DESC');
+
+        if (!in_array('ROLE_MODERATOR', $user->getRoles())) {
+            $qb->where('n.author = :author')
+                ->setParameter('author', $user);
+        }
+
+        return (new Paginator($qb))->paginate($page);
     }
-    */
+
 }

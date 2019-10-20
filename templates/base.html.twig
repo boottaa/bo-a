@@ -1,27 +1,33 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-        <meta name="description" content="">
-        <meta name="author" content="">
-        <title>{% block title %}Welcome to sonata project!{% endblock %}</title>
-        {% block stylesheets %}
-            <link href="{{ asset('statics/css/bootstrap.css') }}" type="text/css" rel="stylesheet" />
-            <link href="{{ asset('statics/font-awesome-4.7.0/css/font-awesome.min.css') }}" type="text/css" rel="stylesheet" />
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+            <meta name="description" content="">
+            <meta name="author" content="">
+            <title>{% block title %}Welcome to sonata project!{% endblock %}</title>
+
+            <link href="{{ asset('statics/css/bootstrap.css') }}" type="text/css" rel="stylesheet"/>
+            <link href="{{ asset('statics/font-awesome-4.7.0/css/font-awesome.min.css') }}" type="text/css" rel="stylesheet"/>
             <style>
                 .btn {
                     border-radius: 0px;
                 }
+                .sonata-wrap{
+                    white-space: pre-wrap;
+                    word-wrap: break-word;
+                }
             </style>
-        {% endblock %}
-        {% block javascripts %}
+            {% block stylesheets %}
+            {% endblock %}
             <script src="{{ asset('statics/js/jquery.min.js') }}"></script>
+            <script src="{{ asset('statics/js/popper.min.js') }}"></script>
             <script src="{{ asset('statics/js/bootstrap.min.js') }}"></script>
             <script src="{{ asset('statics/js/bootstrap.bundle.min.js') }}"></script>
-        {% endblock %}
-    </head>
-    <body>
+            {% block javascripts %}
+            {% endblock %}
+        </head>
+        <body>
         <header>
             <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
                 <div class="container">
@@ -49,14 +55,15 @@
                             <ul class="navbar-nav mr-auto">
                                 {% if is_granted('IS_AUTHENTICATED_FULLY') %}
                                     <li class="nav-item">
-                                        <a class="nav-link {{ app.request.get('_route') == 'security_logout' ? 'active' }}" href="{{ path('security_logout') }}">Выйти</a>
-                                    </li>
-                                    <li class="nav-item">
                                         <a class="nav-link {{ app.request.get('_route') == 'adm_index' ? 'active' }}" href="{{ path('adm_index') }}">Профиль</a>
                                     </li>
                                     <li class="nav-item">
-                                        <a style="color: #6ec0ff" class="nav-link active" href="#">18888888888888888888888888 p.</a>
+                                        <a class="nav-link {{ app.request.get('_route') == 'security_logout' ? 'active' }}" href="{{ path('security_logout') }}">Выйти</a>
                                     </li>
+
+{#                                    <li class="nav-item">#}
+{#                                        <span class="badge badge-secondary">{{ app.user.points }} p.</span>#}
+{#                                    </li>#}
                                 {% else %}
                                     <li class="nav-item">
                                         <a class="nav-link {{ app.request.get('_route') == 'security_login' ? 'active' }}" href="{{ path('security_login') }}">Войти</a>

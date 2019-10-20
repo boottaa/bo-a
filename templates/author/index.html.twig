@@ -4,28 +4,20 @@
         <h1 class="mt-5">
             {{ author.fName }} {{ author.lName }}
 
-            {% if btn_subscribed %}
-                <a class="btn btn-success" href="{{ path('subscribed_to_author', {id: author.id}) }}">Подписаться</a>
-            {% elseif app.user.id != author.id %}
-                <a class="btn btn-outline-secondary" href="{{ path('unsubscribe_to_author', {id: author.id}) }}">Отписаться</a>
+            {% if btnSubscribe is not empty %}
+                <a class="btn btn-outline-danger" href="{{ btnSubscribe.path }}">{{ btnSubscribe.title }}</a>
             {% endif %}
         </h1>
         <hr>
         <div class="row">
             <div class="col-lg-12">
                 {% for item in paginator.results %}
-                    <div style="margin-bottom: 25px">
-                        <h4><a style="color: rgb(33, 37, 41);"
-                               href="{{ path('news_view', {id: item.id}) }}">{{ item.title }}</a></h4>
-
-                        <div class="text-muted small">
-                            <a class="text-muted" style="text-decoration: none" href="{{ path('author', {id: item.author.id}) }}"> Автор: {{ item.author.fName }} {{ item.author.LName }}</a>
-                            от: {{ item.publishedAt|date("d.m.Y H:i") }}</div>
-                        <p>{{ item.text }}</p>
-                    </div>
+                    {% include 'news/_item.html.twig' with {'item': item} %}
+                {% else %}
+                    Автор не опубликовали ни одной новости
                 {% endfor %}
+                {% include 'bootstrap4.pagination.html.twig' with {'rout': 'adm_news', 'paginator': paginator} %}
             </div>
         </div>
-        <p class="lead">Фреймвор</p>
     </main>
 {% endblock %}

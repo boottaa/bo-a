@@ -6,7 +6,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints;
 
 /**
- * @ORM\Entity(repositoryClass="App\Repository\CommentsRepository")
+ * @ORM\Entity()
  */
 class Comments
 {

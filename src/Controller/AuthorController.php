@@ -5,8 +5,10 @@ namespace App\Controller;
 use App\Entity\Users;
 use App\Repository\NewsRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 
@@ -17,30 +19,42 @@ class AuthorController extends AbstractController
 {
     /**
      * @Route("/{id<\d+>}", name="author")
+     *
+     * @param Request $request
+     * @param Users $author
+     * @param NewsRepository $news
+     * @return Response
+     * @throws Exception
      */
-    public function index(Users $author, NewsRepository $news)
+    public function index(Request $request, Users $author, NewsRepository $news): Response
     {
         /**
          * @var Users $user
          */
         $user = $this->getUser();
-        $btn_subscribed = false;
-        if (
-            $this->isGranted('ROLE_USER') &&
-            isset($user) &&
-            $user->getId() != $author->getId() &&
-            $user->isFollowed($author) === false
-        ) {
-            $btn_subscribed = true;
+        $page = $request->get('page', 1);
+
+        $btn_subscribe = [];
+        if ($this->isGranted('ROLE_USER') && isset($user) && $user->getId() != $author->getId()) {
+
+            if ($user->isFollowed($author) === false) {
+                $btn_subscribe = [
+                    'title' => 'Подписаться',
+                    'path' => $this->generateUrl('subscribed_to_author', ['id' => $author->getId()])
+                ];
+            } elseif ($user->isFollowed($author) === true) {
+                $btn_subscribe = [
+                    'title' => 'Отписаться',
+                    'path' => $this->generateUrl('unsubscribe_to_author', ['id' => $author->getId()])
+                ];
+            }
         }
-
-
-        $paginator = $news->findLatestAuthor(1, $author);
+        $paginator = $news->findLatestAuthor($author, $page);
 
         return $this->render('author/index.html.twig', [
             'author' => $author,
-            'btn_subscribed' => $btn_subscribed,
-            'paginator' => $paginator,
+            'btnSubscribe' => $btn_subscribe,
+            'paginator' => $paginator
         ]);
     }
 

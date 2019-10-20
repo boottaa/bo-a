@@ -3,17 +3,55 @@
 {% block adm_body %}
     <main role="main" class="container">
         <h1 class="mt-5">
-            Профиль: {{ app.user.username }}
-            <div class="float-right">
-            <a class="btn btn-success" href="{{ path('adm_edit_profile') }}">Редактировать</a>
-            </div>
+            Профиль: {{ app.user.username }}.
+            <a class="btn btn-success d-inline-block float-right"
+               href="{{ path('adm_edit_profile') }}">Редактировать</a>
         </h1>
+
+        <div class="d-inline-block">
+            <div class="text-small">Уровень: {{ level }}</div>
+        </div>
+
         <hr>
+
+        <h5>Опыт:</h5>
+        <div class="progress">
+            {% if(exp > 0) %}
+                <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar"
+                     aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: {{ progress }}%">{{ exp }}
+                    из {{ next }}</div>
+            {% endif %}
+        </div>
+        <span class="text-muted small">До следующего уровня: {{ exp }} из {{ next }}</span>
+        <br>
+        <br>
 
         <p>
             Реферальная ссылка: <a href="{{ ref_link }}"> {{ ref_link }}</a><br>
             Количество рефералов: {{ ref_count }}<br>
-            Количество подписок: {{ followers }}
+            Количество подписок: {{ followers }} <br>
+            Количество подписчиков: {{ subscribes }} <br>
         </p>
+        <br>
+
+        <h3>Последнние события</h3>
+        <table class="table table-hover">
+            <thead>
+            <tr>
+                <th scope="col">Событие</th>
+                <th scope="col">Дата</th>
+            </tr>
+            </thead>
+            <tbody>
+
+            {% for log in logs %}
+                <tr>
+                    <td>{{ log.action }}</td>
+                    <td>{{ log.createdAt | date("d.m.Y H:i") }}</td>
+                </tr>
+            {% endfor %}
+
+            </tbody>
+        </table>
     </main>
 {% endblock %}

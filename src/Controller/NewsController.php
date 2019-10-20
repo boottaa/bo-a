@@ -3,30 +3,43 @@
 namespace App\Controller;
 
 use App\Entity\Comments;
-use App\Entity\Dislikes;
-use App\Entity\Likes;
 use App\Entity\News;
 use App\Events\CommentCreatedEvent;
 use App\Form\CommentType;
 use App\Repository\NewsRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Cache;
 
+/**
+ * Class NewsController
+ * @package App\Controller
+ */
 class NewsController extends AbstractController
 {
     /**
-     * @Route("/news", defaults={"page": "1", "_format"="html"}, methods={"GET"}, name="news_index")
-     * @Route("/news/rss.xml", defaults={"page": "1", "_format"="xml"}, methods={"GET"}, name="news_rss")
-     * @Route("/news/page/{page<[1-9]\d*>}", defaults={"_format"="html"}, methods={"GET"}, name="news_index_paginated")
+     * @Route("/news/{tag}", defaults={"tag": "all", "_format"="html"}, methods={"GET"}, name="news_index")
+     * @Route("/news/{tag}/rss.xml", defaults={"tag": "all", "_format"="xml"}, methods={"GET"}, name="news_rss")
      * @Cache(smaxage="10")
+     *
+     * @param Request $request
+     * @param string $tag
+     * @param string $_format
+     * @param NewsRepository $news_repo
+     * @return Response
+     * @throws Exception
      */
-    public function index(Request $request, int $page, string $_format, NewsRepository $news_repo)
+    public function index(Request $request, string $tag, string $_format, NewsRepository $news_repo): Response
     {
-        $results = $news_repo->findLatest($page);
+        $tags = explode('&',  mb_strtolower($tag));
+
+        $page = $request->get('page', 1);
+        $results = $news_repo->findLatest($tags, $page);
 
         return $this->render('news/index.html.twig', [
             'paginator' => $results,
@@ -34,22 +47,30 @@ class NewsController extends AbstractController
     }
 
     /**
-     * @Route("/news/{id}", name="news_view")
+     * @Route("/news/view/{id}-{text}", name="news_view")
+     *
+     * @param News $news
+     * @return Response
      */
-    public function view(News $news)
+    public function view(News $news): Response
     {
         return $this->render('news/view.html.twig', [
             'news' => $news,
         ]);
     }
 
-    public function commentForm(Request $request, EntityManagerInterface $em, EventDispatcherInterface $eventDispatcher, News $news)
+    /**
+     * @param Request $request
+     * @param EntityManagerInterface $em
+     * @param EventDispatcherInterface $eventDispatcher
+     * @param News $news
+     * @return Response
+     */
+    public function commentForm(Request $request, EntityManagerInterface $em, EventDispatcherInterface $eventDispatcher, News $news): Response
     {
-        $form = $this->createForm(CommentType::class);
-
         return $this->render('news/_comment_form.html.twig', [
             'news' => $news,
-            'form' => $form->createView(),
+            'form' => $this->createForm(CommentType::class)->createView()
         ]);
     }
 
@@ -68,10 +89,10 @@ class NewsController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $em->persist($comment);
             $em->flush();
-            // See https://symfony.com/doc/current/components/event_dispatcher.html
+
             $eventDispatcher->dispatch(new CommentCreatedEvent($comment));
 
-            return $this->redirectToRoute('news_view', ['id' => $news->getId()]);
+            return $this->redirectToRoute('news_view', ['id' => $news->getId(), 'text' => $news->getSlug()]);
         }
 
         return $this->render('news/comment_form_error.html.twig', [
@@ -79,68 +100,4 @@ class NewsController extends AbstractController
             'form' => $form->createView(),
         ]);
     }
-//
-//    /**
-//     * @Route("/news/add/like/{id}", name="news_add_like")
-//     */
-//    public function addLike(Request $request, EntityManagerInterface $em, EventDispatcherInterface $eventDispatcher, News $news)
-//    {
-//        $is_vote = false;
-//        foreach ($news->getLikes() as $like) {
-//            if ($like->getUser() === $this->getUser()) {
-//                $is_vote = true;
-//            }
-//        }
-//
-//        foreach ($news->getDislikes() as $dislike) {
-//            if ($dislike->getUser() === $this->getUser()) {
-//                $is_vote = true;
-//            }
-//        }
-//
-//        if ($is_vote) {
-//            $news->removeLike($news->getLikes()->current());
-//        } else {
-//            $like = new Likes();
-//            $like->setUser($this->getUser());
-//            $news->addLike($like);
-//            $em->persist($like);
-//        }
-//
-//        $em->flush();
-//
-//        return $this->redirectToRoute('news_view', ['id' => $news->getId()]);
-//    }
-//
-//    /**
-//     * @Route("/news/add/dislike/{id}", name="news_add_dislike")
-//     */
-//    public function addDislike(Request $request, EntityManagerInterface $em, EventDispatcherInterface $eventDispatcher, News $news)
-//    {
-//        $is_vote = false;
-//        foreach ($news->getLikes() as $like) {
-//            if ($like->getUser() === $this->getUser()) {
-//                $is_vote = true;
-//            }
-//        }
-//
-//        foreach ($news->getDislikes() as $dislike) {
-//            if ($dislike->getUser() === $this->getUser()) {
-//                $is_vote = true;
-//            }
-//        }
-//
-//        if ($is_vote) {
-//            $news->removeDislike($news->getDislikes()->current());
-//        } else {
-//            $dislike = new Dislikes();
-//            $dislike->setUser($this->getUser());
-//            $news->addDislike($dislike);
-//            $em->persist($dislike);
-//        }
-//        $em->flush();
-//
-//        return $this->redirectToRoute('news_view', ['id' => $news->getId()]);
-//    }
-
 }

@@ -72,8 +72,7 @@ class LikesController extends AbstractController
         $em->flush();
 
         return new JsonResponse([
-            'success' => true,
+            'success' => true
         ]);
-//        return $this->redirectToRoute('news_view', ['id' => $news->getId()]);
     }
 }

@@ -1,0 +1,28 @@
+<style>
+    .sonata-view-likers {
+        border: solid 1px #b3b3b3;
+        color: #8c8c8c;
+        padding: 4px 15px;
+    }
+</style>
+<div style="margin-bottom: 25px; padding: 0px 0px 30px;">
+    <h4><a style="color: rgb(33, 37, 41);"
+           href="{{ path('news_view', {id: item.id, text: item.slug }) }}">{{ item.title }}</a></h4>
+
+    <div class="text-muted small">
+        <i class="fa sonata-view-likers fa-thumbs-up"
+           aria-hidden="true">&nbsp; {{ item.likes.count }}</i>
+        <i class="fa sonata-view-likers fa-thumbs-down"
+           aria-hidden="true">&nbsp; {{ item.dislikes.count }}</i>
+        <br>
+        <a class="text-muted" style="text-decoration: none"
+           href="{{ path('author', {id: item.author.id}) }}">
+            Автор: {{ item.author.fName }} {{ item.author.LName }}</a>
+        от: {{ item.publishedAt|date("d.m.Y H:i") }}
+        <br>
+        Просмотры: {{ item.visitors }} Комментарии: {{ item.comments.count }}
+    </div>
+    <br>
+    <p class="sonata-wrap">{{ item.description }}</p>
+</div>
+
