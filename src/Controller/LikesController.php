@@ -3,6 +3,8 @@
 namespace App\Controller;
 
 use App\Entity\News;
+use App\Utils\ExpLibs\Dislike;
+use App\Utils\ExpLibs\Like;
 use App\Utils\Likes;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -47,6 +49,7 @@ class LikesController extends AbstractController
         $likes->setNews($news)->setUser($this->getUser());
 
         $need_add = true;
+        $user = $this->getUser();
 
         if ($dislike = $likes->userVoteDislikes()) {
             $news->removeDislike($dislike);
@@ -59,12 +62,12 @@ class LikesController extends AbstractController
 
         if ($type === 'like' && $need_add) {
             $newObject = new \App\Entity\Likes();
-            $newObject->setUser($this->getUser());
+            $newObject->setUser($user);
             $news->addLike($newObject);
             $em->persist($newObject);
         } elseif ($type === 'dislike' && $need_add) {
             $newObject = new \App\Entity\Dislikes();
-            $newObject->setUser($this->getUser());
+            $newObject->setUser($user);
             $news->addDislike($newObject);
             $em->persist($newObject);
         }

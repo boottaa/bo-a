@@ -9,7 +9,7 @@ use App\Form\AddEditNewsType;
 use App\Repository\NewsRepository;
 use App\Security\NewsVoter;
 use App\Utils\Exp;
-use App\Utils\Points;
+use App\Utils\ExpLibs\AddedNews;
 use App\Utils\Slugger;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
@@ -40,7 +40,7 @@ class NewsController extends AbstractController
      * @return Response
      * @throws Exception
      */
-    public function index(Request $request, EntityManagerInterface $em, NewsRepository $news)
+    public function index(Request $request, EntityManagerInterface $em, NewsRepository $news): Response
     {
         $page = $request->get('page', 1);
         $pagination = $news->findLatestForAdmin($page, $this->getUser());
@@ -189,27 +189,22 @@ class NewsController extends AbstractController
      *
      * @param Request $request
      * @param EntityManagerInterface $em
+     * @param AddedNews $addedNews
      * @param News $news
      * @param int $status
      * @return Response
      * @throws Exception
      */
-    public function isPublish(Request $request, EntityManagerInterface $em, Exp $exp, News $news, int $status): Response
+    public function isPublish(Request $request, EntityManagerInterface $em, AddedNews $addedNews, News $news, int $status): Response
     {
         if ($news->getStatus() === News::STATUS_IS_NEW) {
             $author = $news->getAuthor();
-            $author->addPoints(Points::ADD_NEWS);
-            $exp->addExp(Exp::ACTION_ADD_NEWS, $author);
 
-            $userLogs = new UsersLogs();
-            $userLogs->setUser($author);
-            $userLogs->setAction(UsersLogs::T_ADD_NEWS, [$news->getTitle(), Exp::ADD_NEWS]);
-            $em->persist($userLogs);
+            $addedNews->add($author, $news);
         }
         $news
             ->setStatus($status)
             ->setUpdatedAt(new \DateTime());
-        $em->persist($news);
         $em->flush();
         return $this->redirectToRoute('adm_news');
     }

@@ -7,6 +7,7 @@ use App\Entity\Users;
 use App\Form\ForgotPasswordType;
 use App\Form\RegistrationType;
 use App\Utils\Exp;
+use App\Utils\ExpLibs\Referal;
 use Doctrine\ORM\EntityManagerInterface;
 use Swift_Mailer;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -47,34 +48,36 @@ class SecurityController extends AbstractController
     /**
      * @Route("/registration", name="security_registration")
      *
-     * @param Request                      $request
-     * @param EntityManagerInterface       $em
+     * @param Request $request
+     * @param Security $security
+     * @param EntityManagerInterface $em
      * @param UserPasswordEncoderInterface $encoder
      *
+     * @param Referal $referal
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function registration(Request $request, Security $security, EntityManagerInterface $em, UserPasswordEncoderInterface $encoder, Exp $exp)
+    public function registration(Request $request, Security $security, EntityManagerInterface $em, UserPasswordEncoderInterface $encoder, Referal $referal)
     {
         if ($security->isGranted('ROLE_USER')) {
             return $this->redirectToRoute('index');
         }
 
-        $users = new Users();
-        $form = $this->createForm(RegistrationType::class, $users);
+        $user = new Users();
+        $form = $this->createForm(RegistrationType::class, $user);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $invided = $_COOKIE['ref_id'] ?? 0;
-            $users
-                ->setPassword($encoder->encodePassword($users, $form->get('password')->getData()))
+            $user
+                ->setPassword($encoder->encodePassword($user, $form->get('password')->getData()))
                 ->setInvited($invided)
                 ->setRefHash(md5($form->get('email')->getData() . $form->get('login')->getData()));
-            $em->persist($users);
+            $em->persist($user);
 
-            if (!empty($invided)) {
+            if (!empty($invided) && empty($user->getId())) {
                 /** @var Users $invidedUser */
                 $invidedUser = $em->find(Users::class, $invided);
-                $exp->addExp(Exp::ACTION_REFERAL, $users, $invidedUser);
+                $referal->add($invidedUser, $user);
             }
             $em->flush();
             return $this->redirectToRoute('security_login');

@@ -432,4 +432,19 @@ class Users implements UserInterface, \Serializable
     {
         return $this->usersLogs;
     }
+
+
+    /**
+     * @param UsersLogs $usersLogs
+     * @return $this
+     */
+    public function addUsersLogs(UsersLogs $usersLogs): self
+    {
+        if (!$this->usersLogs->contains($usersLogs)) {
+            $usersLogs->setUser($this);
+        }
+
+        return $this;
+    }
+
 }

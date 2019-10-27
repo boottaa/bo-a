@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Users;
 use App\Repository\NewsRepository;
+use App\Utils\ExpLibs\Subscribe;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -62,13 +63,14 @@ class AuthorController extends AbstractController
      * @Route("/subscribed/{id<\d+>}", name="subscribed_to_author")
      * @IsGranted("ROLE_USER")
      */
-    public function subscribed(Users $author, EntityManagerInterface $em)
+    public function subscribed(Users $author, EntityManagerInterface $em, Subscribe $subscribe)
     {
         /**
          * @var Users $user
          */
         $user = $this->getUser();
 
+        $subscribe->add($author, $user);
         $user->addFolloweTo($author);
         $em->persist($user);
         $em->flush();
