@@ -6,6 +6,8 @@ use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use phpDocumentor\Reflection\Types\Integer;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Validator\Constraints;
 
 /**
@@ -59,7 +61,10 @@ class News
     private $title;
 
     /**
-     * @ORM\Column(type="string", length=2000)
+     * @var Img $img;
+     *
+     * @ORM\OneToOne(targetEntity="Img")
+     * @ORM\JoinColumn(name="img_id", referencedColumnName="id", nullable=true, onDelete="SET NULL")
      */
     private $img;
 
@@ -168,9 +173,15 @@ class News
         return $this->author;
     }
 
-    public function setAuthor(Users $author): void
+    /**
+     * @param Users $author
+     * @return $this
+     */
+    public function setAuthor(Users $author): self
     {
         $this->author = $author;
+
+        return $this;
     }
 
     public function getStatus(): int
@@ -294,13 +305,18 @@ class News
         }
     }
 
-    public function addTag(Tags ...$tags): void
+    /**
+     * @param Tags ...$tags
+     */
+    public function addTag(Tags ...$tags): self
     {
         foreach ($tags as $tag) {
             if (!$this->tags->contains($tag)) {
                 $this->tags->add($tag);
             }
         }
+
+        return $this;
     }
 
     public function removeTag(Tags $tag): void
@@ -368,17 +384,27 @@ class News
         ];
     }
 
+    /**
+     * @return mixed
+     */
     public function getActions()
     {
         return $this->action;
     }
 
-    public function addAction($text, $href)
+    /**
+     * @param $text
+     * @param $href
+     * @return $this
+     */
+    public function addAction($text, $href): self
     {
         $this->action[] = [
             'text' => $text,
             'href' => $href,
         ];
+
+        return  $this;
     }
 
     /**
@@ -386,33 +412,33 @@ class News
      */
     public function getImg(): ?string
     {
+        $img = $this->img;
+        return $img ? $img->getUrl() : '';
+    }
+
+    /**
+     * @return Img|null
+     */
+    public function getImgEntity(): ?Img
+    {
         return $this->img;
     }
 
     /**
-     * @param string|null $img
+     * @param Img|null $img
      * @return $this
      */
-    public function setImg(string $img = null): self
+    public function setImg(?Img $img): self
     {
-        if(isset($img)){
-            $this->img = $img;
-        }
+        $this->img = $img;
 
         return $this;
-    }
-
-    public function removeImg(): self
-    {
-        if(!empty($this->img)){
-            $this->img = null;
-        }
     }
 
     /**
      * @return string
      */
-    public function getSlug()
+    public function getSlug(): string
     {
         return $this->slug;
     }

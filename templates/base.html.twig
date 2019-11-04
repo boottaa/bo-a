@@ -3,9 +3,10 @@
         <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-            <meta name="description" content="">
-            <meta name="author" content="">
             <title>{% block title %}Welcome to sonata project!{% endblock %}</title>
+            <meta name="description" content="{% block description %}description default{% endblock %}">
+            <meta name="author" content="{% block author %}author default{% endblock %}">
+            <meta name="keywords" content="{% block keywords %}keywords default{% endblock %}" />
 
             <link href="{{ asset('statics/css/bootstrap.css') }}" type="text/css" rel="stylesheet"/>
             <link href="{{ asset('statics/font-awesome-4.7.0/css/font-awesome.min.css') }}" type="text/css" rel="stylesheet"/>

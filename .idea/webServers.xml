@@ -13,6 +13,14 @@
       <webServer id="c2376fe1-12dd-4b46-b19e-76d3a54bcdbd" name="sonata" url="http://sonata.local">
         <fileTransfer port="0" accessType="LOCAL" />
       </webServer>
+      <webServer id="447b7b5f-9497-4109-98af-03b4c8e5d517" name="bo-a" url="http://151.248.123.85">
+        <fileTransfer host="151.248.123.85" port="22" rootFolder="/var/www/html" accessType="SFTP">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+          <option name="port" value="22" />
+        </fileTransfer>
+      </webServer>
     </option>
   </component>
 </project>

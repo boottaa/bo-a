@@ -27,6 +27,7 @@ class AddEditNewsType extends AbstractType
     {
         $builder
             ->add('img', FileType::class, [
+                'mapped' => false,
                 'label' => 'Изображение',
                 'attr' => ['class' => 'uploadPreview'],
                 'required' => false,

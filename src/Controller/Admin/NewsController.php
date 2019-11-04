@@ -10,6 +10,7 @@ use App\Repository\NewsRepository;
 use App\Security\NewsVoter;
 use App\Utils\Exp;
 use App\Utils\ExpLibs\AddedNews;
+use App\Utils\LibImg;
 use App\Utils\Slugger;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
@@ -127,7 +128,7 @@ class NewsController extends AbstractController
      * @return Response
      * @throws Exception
      */
-    public function add(Request $request, EntityManagerInterface $em, Slugger $slugger, News $news = null): Response
+    public function add(Request $request, EntityManagerInterface $em, Slugger $slugger, News $news = null, LibImg $img): Response
     {
         /**
          * @var Users $user
@@ -139,14 +140,12 @@ class NewsController extends AbstractController
         } else {
             $this->denyAccessUnlessGranted(NewsVoter::EDIT, $news, "Вы можете редактировать только свои новости");
         }
-
         $form = $this->createForm(AddEditNewsType::class, $news);
         //Дату публикации нельзя редактировать
         if (!empty($news->getId())) {
             $form->remove('publishedAt');
         }
         $form->handleRequest($request);
-
 
         if ($form->isSubmitted() && $form->isValid()) {
             $news->setStatus(News::STATUS_IS_NEW);
@@ -156,19 +155,20 @@ class NewsController extends AbstractController
              * @var UploadedFile $file
              */
             $file = $form['img']->getData();
-            if (!empty($file)) {
-                $dir = __DIR__ . '/../../../public/img/';
-                $extension = $file->guessExtension();
-                if (!$extension) {
-                    // расширение не может быть угадано
-                    $extension = 'bin';
+
+            if ($file !== null){
+                //Если у новости есть файл то удаляем его
+                $imgCheck = $news->getImgEntity();
+                if ($imgCheck !== null) {
+                    $img->delete($imgCheck);
                 }
-                $fileUploaded = $file->move($dir, md5(random_int(1, 99999)) . '.' . $extension);
-                $news->setImg('/img/' . $fileUploaded->getFilename());
+                $img_id = $img->upload($file);
+
+                $news->setImg($img_id);
             }
             //END UPLOAD FILE
 
-            if (!empty($news->getId())) {
+            if ($news->getId() !== null) {
                 $news->setUpdatedAt(new \DateTime());
             }
             $news->setSlug($slugger->slugify($form['title']->getData()));

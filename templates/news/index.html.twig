@@ -1,6 +1,8 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello NewsController!{% endblock %}
+{% block title %}Все новости за сегодня, специальная подборка, экстренные новости{% endblock %}
+{% block description %}Специальная подборка, экстренные новости, Все самые свежие новости за сегодня, политика, мир и просто полезные статьи{% endblock %}
+{% block author %}bo-a{% endblock %}
 
 {% block body %}
     <link href="{{ asset('statics/css/bootstrap-tokenfield.min.css') }}" type="text/css" rel="stylesheet"/>
@@ -46,8 +48,10 @@
         url = (location.href).split('/');
         params = null;
         if(url.length > 4){
-            params = url.pop();
+            params = (url.pop()).replace(/\?[\d\w\-\_\=]+/i, '');
         }
+
+        console.log(params);
         url = url.join('/');
 
         $('.tokenfield').tokenfield({
@@ -65,7 +69,7 @@
             location.href = url + '/' + p.join('&');
         });
         $('.tokenfield').on('tokenfield:createtoken', function (e) {
-            var loc = url + '/';
+            var loc = '/news/';
             if (params !== null) {
                 loc += params + '&' + e.attrs.value;
             }else{

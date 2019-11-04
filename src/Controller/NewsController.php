@@ -25,7 +25,7 @@ class NewsController extends AbstractController
     /**
      * @Route("/news/{tag}", defaults={"tag": "all", "_format"="html"}, methods={"GET"}, name="news_index")
      * @Route("/news/{tag}/rss.xml", defaults={"tag": "all", "_format"="xml"}, methods={"GET"}, name="news_rss")
-     * @Cache(smaxage="10")
+     * @Cache(smaxage="0")
      *
      * @param Request $request
      * @param string $tag

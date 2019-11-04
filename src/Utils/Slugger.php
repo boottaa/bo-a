@@ -8,7 +8,7 @@ namespace App\Utils;
  */
 class Slugger
 {
-    function rus2translit($string)
+    private function rus2translit($string)
     {
         $converter = array(
             'а' => 'a', 'б' => 'b', 'в' => 'v',

@@ -1,5 +1,9 @@
 {% extends 'base.html.twig' %}
-{% block title %}Hello NewsController!{% endblock %}
+{% block title %}{{ news.title }}{% endblock %}
+{% block description %}{{ news.description }}{% endblock %}
+{% block author %}{{ news.author.fName }} {{ news.author.LName }}{% endblock %}
+{% block keywords %}{{ news.tags|join(', ') }}{% endblock %}
+
 {% block body %}
     <main role="main" class="container">
         <h1 class="mt-5" style="word-wrap: break-word;">
